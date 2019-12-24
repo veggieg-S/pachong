@@ -1,0 +1,166 @@
+# 导入开发模块
+import requests
+from bs4 import BeautifulSoup
+from requests.exceptions import RequestException #请求异常
+
+# 定义空列表，用于创建所有的爬虫链接
+urls = []
+headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
+# 指定爬虫所需的上海各个区域名称
+regions = ['yanta','beilin','changan4','weiyang','lianhu','xinchengqu','baqiao']
+
+# 基于for循环，构造完整的爬虫链接
+for i in regions:
+    url = 'http://xa.lianjia.com/ershoufang/%s/' % i
+    res = requests.get(url, headers=headers)  # 发送get请求
+    res = res.text.encode(res.encoding).decode('utf-8')  # 需要转码，否则会有问题 #这句话是否有用，先编码，再解码
+    soup = BeautifulSoup(res, 'html.parser')  # 使用bs4模块，对响应的链接源代码进行html解析
+    pages = int(eval(soup.find('div', {'class': 'page-box house-lst-page-box'})['page-data'])['totalPage'])  # 找出每个区域总共有多少页
+
+    for j in range(1, pages + 1):
+        urls.append('http://xa.lianjia.com/ershoufang/%s/pg%s' % (i, j))
+#print(urls)
+# 创建csv文件，用于后面的保存数据
+file = open('lianjia.csv','w',encoding="utf-8")
+for ur in urls: # 基于for循环，抓取出所有满足条件的标签和属性列表，存放在find_all中
+    res1 = requests.get(ur, headers=headers)
+    res1 = res1.text.encode(res1.encoding).decode('utf-8')
+    soup = BeautifulSoup(res1, 'html.parser')
+    res2 = soup.find_all(name='div', attrs={'class': 'info clear'})
+    for z in range(len(res2)):
+        region = ur.split("/")[4]
+        title = res2[z].find(name="div", attrs={'class': 'title'}).text
+        name = res2[z].find(name="div", attrs={"class": "positionInfo"}).find(name="a").text.strip()
+        house = res2[z].find(name="div", attrs={"class": "houseInfo"}).text.strip()
+        room_type = house.split("|")[0].strip()
+        size = house.split("|")[1].strip()
+        chaoxiang = house.split("|")[2].strip()
+        zhuangxiu = house.split("|")[3].strip()
+        louceng = house.split("|")[4].strip()
+        price = res2[z].find(name="div", attrs={"class": "totalPrice"}).text.strip()
+        unitPrice = res2[z].find(name="div", attrs={"class": "unitPrice"}).text.strip()
+        file.write(','.join((region,title, name, room_type, size, chaoxiang,zhuangxiu,louceng,price,unitPrice)) + '\n')
+
+
+file.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
